@@ -24,7 +24,5 @@
    #:eq-comparer
 
    ;; Types
-   #:tree-map
-   #:tree-map-p
    #:persistent-tree-map
    #:persistent-tree-map-p))
