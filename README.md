@@ -1,10 +1,8 @@
 # persistent-tree-map
 
-A fast Persistent Tree Map implementation based upon Clojure's.
+The `persistent-tree-map` is an immutable red-black tree with O(log(n)) reads and writes. Credit goes to the implementation of Persistent Tree Map in Clojure upon which this implementation is based.
 
-A Tree Map is a [Tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) of key-value pairs.
-
-The `persistent-tree-map` is an immutable red-black tree with O(log(n)) reads and writes.
+A tree map is a [Tree](https://en.wikipedia.org/wiki/Tree_(data_structure)) of key-value pairs.
 
 ## Usage
 
