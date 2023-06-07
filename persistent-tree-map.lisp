@@ -2,7 +2,6 @@
 
 (in-package #:persistent-tree-map)
 
-(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
 ;; struct definitions
 
 (defstruct node
@@ -14,7 +13,7 @@
 
 (defstruct (persistent-tree-map (:conc-name ptm-))
   (count nil :type fixnum :read-only t)
-  (comparator nil :type (or (function (t t) fixnum) symbol) :read-only t)
+  (comparator nil :type (function (t t) fixnum) :read-only t)
   (tree nil :type (or node null)))
 
 ;; accessor macros
@@ -51,21 +50,25 @@
   (make-node :key key :value val :left left :right right :is-red t))
 
 (defun black (key val left right)
+  (declare (optimize (speed 3) (safety 0)))
   (make-node :key key :value val :left left :right right :is-red nil))
 
 (defun blacken (node)
+  (declare (optimize (speed 3) (safety 0)))
   (if (node-is-red node)
       (with-node (key val left right) node
 	(make-node :key key :value val :left left :right right :is-red nil))
       node))
 
 (defun redden (node)
+  (declare (optimize (speed 3) (safety 0)))
   (if (node-is-red node)
       node
       (with-node (key val left right) node
 	(make-node :key key :value val :left left :right right :is-red nil))))
 
 (defun left-balance (key val ins right)
+  (declare (optimize (speed 3) (safety 0)))
   (cond ((and (node-is-red ins) (node-is-red (node-left ins)))
 
 	 (red (node-key ins) (node-value ins)
@@ -80,6 +83,7 @@
 	(t (black key val ins right))))
 
 (defun right-balance (key val left ins)
+  (declare (optimize (speed 3) (safety 0)))
   (cond ((and (node-is-red ins) (node-is-red (node-right ins)))
 	 (red (node-key ins) (node-value ins)
 		   (black key val left (node-left ins))
@@ -94,6 +98,7 @@
 	(t (black key val left ins))))
 
 (defun balance-left-del (key val del right)
+  (declare (optimize (speed 3) (safety 0)))
   (cond ((node-redp del)
 	 (red key val (blacken del) right))
 	((node-blackp right)
@@ -108,6 +113,7 @@
 	(t (error "Invariant violation"))))
 
 (defun balance-right-del (key val left del)
+  (declare (optimize (speed 3) (safety 0)))
   (cond ((node-redp del)
 	 (red key val left (blacken del)))
 	((node-blackp left)
@@ -122,6 +128,7 @@
 	(t (error "Invariant violation"))))
 
 (defun node-append (left right)
+  (declare (optimize (speed 3) (safety 0)))
   (cond ((not left) right)
 	((not right) left)
 	((node-redp left)
@@ -162,10 +169,12 @@
 					  (node-right right))))))))
 
 (defun do-compare (ptm key1 key2)
+  (declare (optimize (speed 3) (safety 0)))
   (let ((comp (ptm-comparator ptm)))
     (funcall comp key1 key2)))
 
 (defun node-remove (ptm n key)
+  (declare (optimize (speed 3) (safety 0)))
   (when n
     (let ((c (do-compare ptm key (node-key n))))
       (if (= c 0)
@@ -188,14 +197,17 @@
 	       found)))))))
 
 (defun node-balance-left (node parent)
+  (declare (optimize (speed 3) (safety 0)))
   (with-node (key val left right) parent
     (black key val node right)))
 
 (defun node-balance-right (node parent)
+  (declare (optimize (speed 3) (safety 0)))
   (with-node (key val left right) parent
     (black key val left node)))
 
 (defun node-add-left (node ins)
+  (declare (optimize (speed 3) (safety 0)))
   (if (node-is-red node)
       (with-node (key val left right)
 		 node
@@ -203,6 +215,7 @@
       (node-balance-left ins node))
 
 (defun node-add-right (node ins)
+  (declare (optimize (speed 3) (safety 0)))
   (if (node-is-red node)
       (with-node (key val left right)
 		 node
@@ -210,6 +223,7 @@
       (node-balance-right ins node)))
 
 (defun ptm-add (ptm node key val)
+  (declare (optimize (speed 3) (safety 0)))
   (if node
       (let ((c (do-compare ptm key (node-key node))))
 	(if (= c 0)
@@ -229,11 +243,13 @@
       (values (make-node :key key :value val :is-red t) nil)))
 
 (defun node-replace (node key val left right)
+  (declare (optimize (speed 3) (safety 0)))
   (if (node-is-red node)
       (red key val left right)
       (black key val left right)))
 
 (defun ptm-replace (ptm node key val)
+  (declare (optimize (speed 3) (safety 0)))
   (with-node (n-key n-val left right) node
     (let ((c (do-compare ptm key n-key)))
       (node-replace node n-key 
@@ -242,6 +258,7 @@
 		    (if (> c 0) (ptm-replace ptm right key val) right)))))
 
 (defun ptm-assoc (ptm key val)
+  (declare (optimize (speed 3) (safety 0)))
   (with-ptm (tree comp cnt) ptm
     (multiple-value-bind (node found)
 	(ptm-add ptm tree key val)
@@ -256,6 +273,7 @@
 					:tree (ptm-replace ptm tree key val)))))))
 
 (defun ptm-without (ptm key)
+  (declare (optimize (speed 3) (safety 0)))
   (with-ptm (tree comp cnt) ptm
     (multiple-value-bind (node found)
 	(node-remove ptm tree key)
@@ -270,6 +288,7 @@
 	  ptm))))
 
 (defun ptm-lookup (ptm key)
+  (declare (optimize (speed 3) (safety 0)))
   (loop for node = (ptm-tree ptm)
 	  then (if (< comparison 0)
 		   (node-left node)
@@ -280,6 +299,7 @@
 	  do (return (values t (node-value node)))))
 
 (defun create (comp &rest items)
+  (declare (optimize (speed 3) (safety 0)))
   (loop for ret = (make-persistent-tree-map :count 0 :comparator comp)
 	  then (ptm-assoc ret key val)
 	for lst on items by #'cddr
@@ -291,6 +311,7 @@
 
 (declaim (ftype (function (t t) fixnum) eq-comparer))
 (defun eq-comparer (left right)
+  (declare (optimize (speed 3) (safety 0)))
   (cond ((eq left right) 0)
 	((null left) -1)
 	((null right) 1)
@@ -298,6 +319,7 @@
 	(:else 1)))
 
 (defun make-iterator (ptm)
+  (declare (optimize (speed 3) (safety 0)))
   (let ((current-node (list (ptm-tree ptm))))
     (labels ((left-most ()
 	       (loop for top = (car current-node)

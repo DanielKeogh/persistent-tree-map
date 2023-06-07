@@ -2,8 +2,6 @@
 
 (in-package #:persistent-tree-map)
 
-(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
-
 (defun make-tree-map (comparer-fn &rest pairs)
   "Make a persistent-tree-map. Comparer should be a (function (x y) fixnum) that returns 0 for equal items, 1 when (< x y) and -1 when (> y x)."
   (loop with map = (make-persistent-tree-map :count 0 :comparator comparer-fn :tree nil)
