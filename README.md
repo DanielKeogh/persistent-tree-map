@@ -38,46 +38,46 @@ For example, this is the implementation for the eq-comparer provided with this l
 **Constructor:**
 
 ```lisp
-(ptm:make-tree-map nil 1 "a" 'foo)
+(ptm:make-tree-map 'ptm:eq-comparer nil 1 "a" 'foo)
 ;; #<treemap nil 1,"a" FOO>
 ```
 
 **Adding:**
 
 ```lisp:
-(ptm:add (ptm:make-tree-map 1 "foo") 1 "bar")
+(ptm:add (ptm:make-tree-map 'ptm:eq-comparer 1 "foo") 1 "bar")
 ;; #<treemap 1 "bar">
 ```
 
 **Removing:**
 ```lisp
-(ptm:remove (ptm:make-tree-map 1 1 2 2) 1)
+(ptm:remove (ptm:make-tree-map 'ptm:eq-comparer 1 1 2 2) 1)
 ;; #<treemap 2 2>
 ```
 
 **Finding values:**
 ```lisp
-(ptm:value (ptm:make-tree-map "foo" 2 "bar") 1)
+(ptm:value (ptm:make-tree-map 'ptm:eq-comparer "foo" 2 "bar") 1)
 ;; "foo"
 ```
 
 **Testing keys:**
 
 ```lisp
-(ptm:has-key (ptm:make-tree-map 1 1 2 2) 1)
+(ptm:has-key (ptm:make-tree-map 'ptm:eq-comparer 1 1 2 2) 1)
 ;; T
-(ptm:has-key (ptm:make-tree-map 1 1 2 2) 100)
+(ptm:has-key (ptm:make-tree-map 'ptm:eq-comparer 1 1 2 2) 100)
 ;; nil
 ```
 
 **Length/Count:**
 
 ```lisp
-(ptm:length (ptm:make-tree-map 1 "foo" 2 "bar"))
+(ptm:length (ptm:make-tree-map 'ptm:eq-comparer 1 "foo" 2 "bar"))
 ;; 2
 ```
 
-**Mapping:**
+**Mapping:*
 
 ```lisp
 (ptm:map (ptm:make-tree-map 1 100 2 200 3 300)
@@ -88,7 +88,7 @@ For example, this is the implementation for the eq-comparer provided with this l
 **Reduce:**
 
 ```lisp
-(ptm:reduce (ptm:make-tree-map 1 0 2 0 3 0)
+(ptm:reduce (ptm:make-tree-map 'ptm:eq-comparer 1 0 2 0 3 0)
             (lambda (start key val) (+ start key val))
             0)
 ;; 6
